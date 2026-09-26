@@ -1,0 +1,8 @@
+.lake/
+.deps/
+scratch/
+__pycache__/
+FourColor/Scratch/
+/final-run-results/
+/final-run-results-*.tar.gz
+/final-run-summary-*.txt

@@ -1,0 +1,199 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/mathlib-initiative/formalization.yaml/main/schema/formalization.schema.json
+# formalization.yaml v0.4
+version: "v0.4"
+
+project:
+  name: "The Four Color Theorem (Lean 4 port of Gonthier's Coq proof)"
+  description: >-
+    A Lean 4 and Mathlib formalization of the Four Color Theorem, ported from Georges Gonthier's
+    Coq proof by Claude Opus 5.5, Anthropic's AI model, working as an agent under the direction
+    of Robert D. Barish. The main theorem, FourColor.RealPlane.four_color, states that every simple map of
+    the real plane can be colored with at most four colors so that adjacent regions get
+    different colors. The map may have infinitely many regions, bounded or not; each region must
+    be open and connected, and two regions are adjacent when their closures share a point that
+    lies in the closure of no third region. As in Coq, a compactness argument reduces the
+    theorem to finite maps, which are turned into planar bridgeless hypermaps. A smallest
+    hypermap that cannot be four-colored cannot exist: discharging shows that it would contain
+    one of the 633 configurations of Robertson, Sanders, Seymour and Thomas, and each of these
+    is reducible.
+
+    The port differs from the Coq proof in three main ways. Its statement uses Mathlib's real
+    numbers rather than an arbitrary model of Coq's axiomatized reals; the two are equivalent,
+    because all such models are isomorphic and the definitions use only the order. Coq checks
+    that the 633 configurations are reducible with a procedure on trees of colorings, run by
+    its virtual machine. The port replaces it with a new bit-parallel engine whose certificates,
+    generated during the build, are checked by the Lean kernel itself. Finally, the case
+    analysis of the unavoidability proof, written as tactic scripts in Coq, becomes case trees
+    checked by a checker proved correct once. Every computation is carried out by the Lean
+    kernel, without native_decide, and the proof uses only the axioms propext,
+    Classical.choice and Quot.sound.
+  authors:
+    - "Robert D. Barish"
+  license: "Apache-2.0"
+  responsible_maintainers:
+    - "Robert D. Barish"
+
+classification:
+  arxiv: [math.CO]
+  msc2020: [05C15, 05C10, 68V20, 68V15]
+
+sources:
+  - title: "The four-colour theorem"
+    authors:
+      - "Neil Robertson"
+      - "Daniel P. Sanders"
+      - "Paul Seymour"
+      - "Robin Thomas"
+    type: article
+    id: "doi:10.1006/jctb.1997.1750"
+    location: "Journal of Combinatorial Theory, Series B 70 (1997), 2-44"
+    relationship: formalizes
+    note: >-
+      The unavoidable set of 633 reducible configurations and the discharging rules of this
+      proof are the ones formalized (through Gonthier's Coq development).
+  - title: "Formal Proof—The Four-Color Theorem"
+    authors:
+      - "Georges Gonthier"
+    type: article
+    location: "Notices of the American Mathematical Society 55(11) (2008), 1382-1393"
+    id: "https://www.ams.org/notices/200811/tx081101382p.pdf"
+    relationship: adapts
+    note: >-
+      Describes the Coq/Rocq proof whose definitions, statements, proof structure and data this
+      Lean development ports.
+    license: "CeCILL-B (the Coq development)"
+
+related_formalizations:
+  - id: "https://github.com/math-comp/fourcolor"
+    relationship: adapts
+    note: >-
+      The Coq/Rocq formal proof by Georges Gonthier et al. (Microsoft Research and Inria,
+      CeCILL-B; now maintained as coq-community/fourcolor), ported from commit
+      c1d6b1cd5288bea4b067aac13cdde3c18dffe018. Definitions, statements, proof structure and the
+      combinatorial data are translated; the tree-based reducibility decision procedure is
+      replaced by a new kernel-checkable engine (see fidelity.divergences).
+  - id: "https://github.com/corun1024/4ct"
+    relationship: independent
+    note: >-
+      Chris Emery's Lean 4 formalization of the same statement, public before this one: complete,
+      also following Gonthier and Werner's proof, and also written mostly by AI (Claude Fable
+      5.1). Its reducibility certificates are produced before the Lean build by C and Python
+      programs and are not in its repository (the kernel checks them). Here every file of the
+      proof is Lean source in the repository, and the certificates are computed by Lean code
+      during the build, so the Lean toolchain alone builds and checks the proof. README.md
+      ("Other formalizations") lists the other differences.
+
+status:
+  scope: >-
+    Formalized: the Four Color Theorem for maps in the real plane, exactly the statement of
+    Coq's four_color (fourcolor.v), over Mathlib's real numbers (Challenge.lean); on the way,
+    Coq's four_color_finite (finite maps), four_color_hypermap (every planar bridgeless finite
+    hypermap is four colorable), unavoidability, the C-reducibility of the 633 configurations
+    (theReducibility), the discretization of finite maps into hypermaps and the compactness
+    extension, and the combinatorial theory of planar hypermaps (Euler formula, Jordan
+    property) that they use. Not ported: Coq's axiomatized real numbers and their models (the
+    statement is stated over Mathlib's ℝ, and all models are isomorphic), and Coq's tree-based
+    reducibility decision procedure, which is replaced by a kernel-checked bit-parallel engine
+    proving the same property of each configuration.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: [propext, Classical.choice, Quot.sound]
+
+automation:
+  methods:
+    - method: agent
+      models: ["Claude Opus 5.5 (Anthropic, API model claude-opus-5-5)"]
+      framework: "Claude Code"
+      tool_setup: >-
+        Claude Code, with file and shell tools, the Lean 4 toolchain v4.35.0-rc2 with Mathlib,
+        the Coq sources of math-comp/fourcolor, and Palomar's three checkers (leanchecker,
+        nanoda and con-ron) run on the kernel-heavy declarations.
+      cost:
+        wall_time: "several days (not tracked precisely)"
+        spend_usd: "not tracked"
+      prompting_notes: "Not published."
+  spend_usd: "not tracked"
+  notes: >-
+    Claude Opus 5.5 wrote the Lean development and its proofs, the generators and scripts, and
+    the documentation; Robert D. Barish directed the work and ran the final build and the
+    rehearsal of Palomar's pipeline. The port proceeded in stages: the planarity layer, the
+    real-plane statement and its discretization, the coloring and hypermap theory, the
+    configurations, the reducibility engine, the unavoidability presentations, and the Palomar
+    packaging. The final review was done by an agent that had not written the proof.
+
+fidelity:
+  divergences: |-
+    - Statement over Mathlib's real numbers ℝ, whereas Coq's four_color quantifies over every model of its axiomatized reals (Real.model in reals/real.v). The definitions of realplane.v use only the order of the reals, and all models are isomorphic as ordered fields (Coq realcategorical.v, Mathlib ConditionallyCompleteLinearOrderedField.inducedOrderRingIso), so the two statements are equivalent.
+    - Coq's strict order Real.lt x y is notation for ¬ Real.le y x, while Challenge.lean writes x < y on ℝ, which is equivalent on a linear order (not_le).
+    - Coq's reals are a setoid of denotations, so a Coq region need not be extensional, whereas every region over ℝ is; the regions of a simple map are open, hence extensional in Coq too, so the theorem is unaffected.
+    - The records of realplane.v become Lean structures, with extends for the coercion fields simple_map_plain, finite_simple_map_simple and coloring_plain (projections toPlainMap and toSimpleMap); exists2 becomes ∃ … ∧ …, Peano.lt becomes < on ℕ, and names follow Lean conventions (plain_map → PlainMap, nonempty → NonemptyRegion, open → Open, colorable_with → ColorableWith). The meaning is unchanged.
+    - Coq's hypermap bundles a finType of darts, whereas Lean's Hypermap D takes the dart type as a parameter with Fintype and DecidableEq instances. So discretize_to_hypermap concludes with an existential over the dart type (in Type), its instances and the hypermap, and four_color_hypermap and unavoidability are universe-polymorphic in the dart type.
+    - MinimalCounterExample quantifies its minimality over the hypermaps whose dart type lies in the same universe as D, where Coq's quantifies over all hypermaps; every finite type has an equivalent copy in each universe, so the two notions agree.
+    - compactness_extension is stated for four colours, the case fourcolor.v uses; the Coq lemma for an arbitrary number of colours is compactness_extension_with.
+    - four_color_hypermap, four_color_finite and four_color are first proved with the C-reducibility of the 633 configurations as a hypothesis (the ..._of_reducibility theorems of Combinatorial4ct.lean), which theReducibility then discharges; theReducibility is stated as ReducibleInRange 0 633 theConfigs and restated as Reducibility (Coq's reducibility) through length_theConfigs.
+    - Coq's reducibility decision procedure on trees of colourings (ctree.v, gtree.v, ctreerestrict.v, gtreerestrict.v, initctree.v, initgtree.v, kempetree.v, the ctree parts of cfcolor.v, cfcontract.v and cfreducible.v, and the job and task files) is not ported. A new bit-parallel engine (FourColor/Engine) proves the same property for each configuration, CfReducible (Coq's cfreducible, a record with the fields of C_reducible), from certificates generated at elaboration time and checked by the kernel with decide +kernel.
+    - birkhoff.v's Birkhoff_check2 search is replayed on the same engine, so the check BirkhoffCheck assumed by birkhoff_valid carries the engine's data instead of Coq's trees; the theorem Birkhoff keeps its Coq statement.
+    - The presentation scripts present5.v to present11.v are replaced by case trees checked by a kernel-evaluated checker whose soundness is proved once (checkTree_sound); the leaves use kernel-fast checks proved equal to the faithful ones and quiz trees pruned by certificate masks (sound for any mask), and Coq's vm_compute'd the_quiz_tree and the_drule_fork are literals that the kernel proves equal to their definitions.
+    - The 633 configurations of configurations.v are translated by a script into explicit structure literals, checked by rfl against the port of Coq's Config notation, with the Coq text quoted in each docstring.
+    - The proofs use classical logic freely where Coq's are constructive (for example the case split on colourability in four_color_hypermap, which Coq makes with decide_colorable); Coq's axioms of the reals imply excluded middle, and Classical.choice is a permitted axiom.
+    - Boolean predicates and reflect lemmas become Props and iff, and eqm (extensional equality of hypermaps) becomes equality. In the planarity layer math-comp's rot n p is List.rotate p n (different only when n exceeds the length, and the rotation lemmas are stated for every n), n_comp counts the components meeting a set (equal to math-comp's on the closed sets where it is used), finv of a hypermap permutation is the composite of the other two, and froot uses Classical.epsilon.
+
+review:
+  status: agent-reviewed
+  reviewers:
+    - "Claude Opus 5.5 (an independent review agent that did not write the proof)"
+  notes: >-
+    The final review compared Challenge.lean's 27 definitions and the statement with Coq's
+    realplane.v and fourcolor.v clause by clause, and the statements of four_color_hypermap,
+    unavoidability, theReducibility, discretize_to_hypermap and compactness_extension with
+    their Coq originals; it found no deviation beyond those listed in fidelity.divergences.
+    scripts/check_challenge_sync.py checks that the definitions of Challenge.lean are identical
+    to those of the development, down to the kernel terms of the comparator's dependency
+    closure. In a rehearsal of Palomar's pipeline (scripts/final_run.sh), lake comparator with
+    con-ron, nanoda and leanchecker accepted the proof. No human mathematical review has been
+    done yet.
+
+alignment:
+  namespace: FourColor
+  statements:
+    - source: "fourcolor.v, four_color"
+      lean: FourColor.RealPlane.four_color
+      module: Solution
+      status: proved
+      note: "The statement of Challenge.lean; proved as compactness_extension four_color_finite."
+    - source: "fourcolor.v, four_color_finite"
+      lean: FourColor.RealPlane.four_color_finite
+      module: FourColor.FourColorThm
+      status: proved
+      note: "From discretize_to_hypermap and four_color_hypermap."
+    - source: "combinatorial4ct.v, four_color_hypermap"
+      lean: FourColor.four_color_hypermap
+      module: FourColor.FourColorThm
+      status: proved
+      note: "Every planar bridgeless finite hypermap is four colorable."
+    - source: "unavoidability.v, unavoidability"
+      lean: FourColor.unavoidability
+      module: FourColor.Unavoidability
+      status: proved
+      note: "Reducibility implies that there is no minimal counter-example."
+    - source: "reducibility.v, the_reducibility"
+      lean: FourColor.theReducibility
+      module: FourColor.Reducibility
+      status: proved
+      note: "Stated as ReducibleInRange 0 633 theConfigs; restated as Reducibility by FourColor.reducibility_holds."
+    - source: "discretize.v, discretize_to_hypermap"
+      lean: FourColor.RealPlane.discretize_to_hypermap
+      module: FourColor.Discretize
+      status: proved
+      note: "Existential over the dart type (see fidelity.divergences)."
+    - source: "finitize.v, compactness_extension"
+      lean: FourColor.RealPlane.compactness_extension
+      module: FourColor.Finitize
+      status: proved
+      note: "Stated for four colours; compactness_extension_with is the general statement."
+
+acknowledgements: >-
+  Georges Gonthier and the contributors to the Coq/Rocq development math-comp/fourcolor
+  (coq-community/fourcolor), whose proof this is a port of; Robertson, Sanders, Seymour and
+  Thomas for the configurations and discharging rules; the Lean 4 and Mathlib developers; and
+  the authors of the checkers nanoda and con-ron used by Palomar.

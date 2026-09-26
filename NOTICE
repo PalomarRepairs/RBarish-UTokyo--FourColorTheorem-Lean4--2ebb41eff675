@@ -1,0 +1,27 @@
+Four Color Theorem in Lean 4
+Copyright 2026 the contributors to this repository
+Written by Claude Opus 5.5 (Anthropic), working as an AI agent under the direction of
+Robert D. Barish.
+
+This work is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+It is a port to Lean 4 and Mathlib of the Coq/Rocq formal proof of the Four Color Theorem:
+
+    fourcolor: a formal proof of the Four Color Theorem in Coq
+    Georges Gonthier et al.
+    Copyright (c) 2006-2018 Microsoft Corporation (Microsoft Research) and Inria
+    Distributed under the terms of the CeCILL-B license (see LICENSES/CeCILL-B.txt)
+    https://github.com/math-comp/fourcolor (now maintained as coq-community/fourcolor)
+
+The definitions, the statements, the structure of the proofs and the combinatorial data (the
+633 reducible configurations, the discharging rules and the unavoidability presentations) are
+translated from that development, whose files carry the notice
+
+    (c) Copyright 2006-2018 Microsoft Corporation and Inria.
+    Distributed under the terms of CeCILL-B.
+
+The configurations and discharging rules originate in N. Robertson, D. P. Sanders, P. D. Seymour
+and R. Thomas, "The four-colour theorem", J. Combin. Theory Ser. B 70 (1997), 2-44.
+
+This work depends on Lean 4 and Mathlib (Apache License, Version 2.0), which are not
+redistributed here.
